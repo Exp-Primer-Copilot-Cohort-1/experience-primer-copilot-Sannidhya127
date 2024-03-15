@@ -1,12 +1,30 @@
-const http = require('http');
+// create web server
+var express = require('express');
+var app = express();
+var bodyParser = require('body-parser');
+var fs = require('fs');
+var path = require('path');
+var commentsPath = path.join(__dirname, 'comments.json');
 
-const server = http.createServer((req, res) => {
-    res.statusCode = 200;
-    res.setHeader('Content-Type', 'text/plain');
-    res.end('Hello, world!');
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({extended: true}));
+
+app.get('/comments', function(req, res) {
+  fs.readFile(commentsPath, (err, data) => {
+    if(err) {
+      console.error(err);
+      process.exit(1);
+    }
+    res.json(JSON.parse(data));
+  });
 });
 
-const port = 3000;
-server.listen(port, () => {
-    console.log(`Server running at http://localhost:${port}/`);
-});
+app.post('/comments', function(req, res) {
+  fs.readFile(commentsPath, (err, data) => {
+    if(err) {
+      console.error(err);
+      process.exit(1);
+    }
+    var comments = JSON.parse(data);
+    var newComment = {
+      id: Date.now(),
